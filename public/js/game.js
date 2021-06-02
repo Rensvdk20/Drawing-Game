@@ -50,6 +50,15 @@ pen.onMouseUp = function(event) {
     socket.emit('endPath', send_coords);
 }
 
+document.getElementById('clearDrawing').onclick = function() {
+    console.log('test');
+	paper.project.activeLayer.removeChildren();
+}
+
+$("#undoDrawing").click(function() {
+	path.remove();
+});
+
 //ColorPicker
 $(".cls-2").click(() => { drawingColor = '#8602af' });
 $(".cls-3").click(() => { drawingColor = '#fdfd33' });
