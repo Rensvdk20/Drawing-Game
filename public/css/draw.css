@@ -1,0 +1,220 @@
+/* @font-face {
+    font-family: Roboto;
+    src: url(Fonts/Roboto/Roboto-Black.ttf);
+  } */
+
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    box-sizing: border-box;
+    /* background-image: url(../Img/Background.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover; */
+    background-color: #393E46;
+    overflow-y: hidden;
+    /* font-family: Roboto; */
+}
+
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+.Gridheader { grid-area: Gridheader; height: 150px !important; margin-left: 20px;margin-top: 20px; display: grid; grid-template-columns: 20% 20% 20% 20% }
+.Canvasleft { grid-area: Canvasleft;
+    display: grid;
+    grid-template-rows: 70px 230px 70px 70px 70px 70px;
+    text-align: center;
+    /* width: 200px; */
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.Canvasmiddle { grid-area: Canvasmiddle; }
+.Canvasright { grid-area: Canvasright; }
+.Canvasbottom { grid-area: Canvasbottom;color: black; margin-left: 20px; font-size: 1.5em; margin-top: 5px;}
+
+.Gridcontainer {
+    display: grid;
+    grid-template-areas:
+    'fill1 fill2 Gridheader'
+    'fill1 Canvasleft Canvasmiddle'
+    'fill1 fill3 Canvasbottom';
+    width: 100vw;
+}
+
+.Gridheader {
+    height: 10vh;
+}
+
+.GridheaderContainer {
+    display: grid;
+    grid-template-rows: 120px 30px;
+    text-align: center;
+}
+
+.GridheaderContainer span {
+    margin-top: 2px;
+    color: black;
+    font-size: 1.05em;
+}
+
+.GridheaderContainer img {
+    margin: 0 auto;
+    height: 120px;
+}
+
+.Canvasleft div h1 {
+    color: black
+}
+
+canvas {
+    background-color: white;
+    display: block;
+    border: 5px black solid;
+    border-radius: 20px;
+    height: 600px;
+    width: 1200px;
+    margin-right: 5vw;
+}
+
+.Bottomtools {
+    margin-left: 8vw;
+    margin-top: 10px;
+}
+
+#ColorPicker {
+    width: 200px;
+}
+
+path:hover {
+    cursor: pointer;
+}
+
+ellipse:hover {
+    cursor: pointer;
+}
+
+.fas:hover {
+    color: white !important;
+}
+
+#LobbyIDHolder {
+    text-decoration: underline;
+}
+
+/* .Bottomtools i {
+    margin-left: 50px;
+}
+
+.Bottomtools:first {
+    margin-left: 0;
+} */
+
+@media only screen and (max-width: 1000px) {
+    .Canvasleft {
+      width: auto;
+    }
+  }
+
+.Choosecanvas {
+    display: none;
+}
+
+.ChoosedivContainer {
+    display: none;
+}
+
+.Choosediv {
+    background-color: white;
+    display: block;
+    border: 5px black solid;
+    border-radius: 20px;
+    height: 600px;
+    width: 1200px;
+    margin-right: 5vw;
+    text-align: center;
+}
+
+.Choosediv h1 {
+    margin-top: 180px;
+    font-size: 2.4em;
+}
+
+.input-container2 {
+    width: 350px;
+    position: relative;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.input-effect2 {
+    border: 0;
+    padding: 7px 0;
+    border-bottom: 1px solid #ccc;
+}
+.input-effect2 ~ .focus-border2{
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: #393E46;
+    transition: 0.4s;
+}
+.input-effect2:focus ~ .focus-border2{
+    width: 100%;
+    transition: 0.4s;
+    left: 0px;
+}
+
+.submitWord {
+    width: 135px;
+    height: 40px;
+    margin-top: 20px;
+    background-color: #393E46;
+    color: white;
+    padding: 10px 21px;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    border-radius: 50px;
+    transition-duration: 0.5s;
+}
+
+#cantDraw {
+    width: 150px;
+    height: 40px;
+    background-color: #292c31;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    display: none;
+    font-size: 16px;
+    border: none;
+    outline: none;
+    border-radius: 50px;
+    transition-duration: 0.5s;
+}
+
+#cantDraw:hover {
+    background-color: #1f2125;
+}
+
+.inputWord {
+	width: 100%;
+    font-size: 1em;
+    padding-left: 5px;
+    background-color: white;
+    text-align: center;
+}
+
+input:focus { outline: none; }
+button:focus { outline: none; }
+.submitWord:hover { background-color: #262a30; }
