@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Run when a client connects
 io.on('connection', socket => {
-    console.log("New WS Connection");
+    console.log("New Connection");
 
     socket.on('startPath', (coords) => {
         socket.broadcast.emit('startPath', coords);
