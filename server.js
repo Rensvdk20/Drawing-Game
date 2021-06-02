@@ -15,8 +15,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 io.on('connection', socket => {
     console.log("New Connection");
 
-    socket.on('startPath', (coords) => {
-        socket.broadcast.emit('startPath', coords);
+    socket.on('startPath', (coords, color) => {
+        socket.broadcast.emit('startPath', coords, color);
     });
 
     socket.on('continuePath', (coords) => {
