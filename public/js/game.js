@@ -1,34 +1,53 @@
 var socket = io();
 var drawingColor = 'black';
+var paths = [];
 // var sessionId = io.socket.sessionid;
 
 // ##### RECEIVER ##### //
 var coords;
+var my_path;
 
 paper.install(window);
 paper.setup('DrawArea');
 
-var path;
-
 socket.on('startPath', (coords, color) => {
-    path = new Path();
-    path.strokeColor = color;
-    path.add(coords);
+    my_path = new Path();
+    my_path.strokeColor = color;
+    my_path.add(coords);
     console.log(coords);
 });
 
 socket.on('continuePath', coords => {
-    path.add(new Point(coords));
+    my_path.add(new Point(coords));
 });
 
 socket.on('endPath', coords => {
-    path.simplify();
+    my_path.simplify();
+});
+
+socket.on('toolbox', tool => {
+    console.log(tool);
+
+    switch(tool) {
+        case 'clearDrawing':
+            console.log("clear");
+            break;
+        case 'undoDrawing':
+            console.log("undo");
+            break;
+        default:
+            console.log('nothing found');
+    }
+
+    // path = paths.pop();
+    // path.remove();
 });
 
 // ##### SENDER ##### //
 var pen = new Tool();
+var path;
+
 pen.minDistance = 1;
-path = new Path();
 var send_coords;
 
 pen.onMouseDown = function(event) {
@@ -48,15 +67,19 @@ pen.onMouseDrag = function(event) {
 pen.onMouseUp = function(event) {
     path.simplify();
     socket.emit('endPath', send_coords);
+    paths.push(path);
 }
 
-document.getElementById('clearDrawing').onclick = function() {
-    console.log('test');
+document.getElementById('clearDrawing').onclick = () => {
 	paper.project.activeLayer.removeChildren();
+    socket.emit('toolbox', 'clearDrawing');
 }
 
-$("#undoDrawing").click(function() {
+$("#undoDrawing").click(() => {
+    //Check if array is already empty
+    var path = paths.pop();
 	path.remove();
+    socket.emit('toolbox', 'undoDrawing');
 });
 
 //ColorPicker

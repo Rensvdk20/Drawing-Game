@@ -26,6 +26,10 @@ io.on('connection', socket => {
     socket.on('endPath', (coords) => {
         socket.broadcast.emit('endPath', coords);
     })
+
+    socket.on('toolbox', (tool) => {
+        socket.broadcast.emit('toolbox', tool);
+    })
 });
 
 server.listen(conn_port, () => console.log(`Server running on port ${conn_port}`));

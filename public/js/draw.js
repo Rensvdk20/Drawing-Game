@@ -120,7 +120,7 @@
 // });
 
 // paper.setup('DrawArea');
-// document.getElementById('clear').onclick = function() {
+// document.getElementById('clearDrawing').onclick = function() {
 // 	paper.project.activeLayer.removeChildren();
 // }
 
