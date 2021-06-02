@@ -6,7 +6,7 @@ const socketio = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-const PORT = 3100 || process.env.PORT;
+const conn_port = process.env.PORT || 3100;
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,4 +28,4 @@ io.on('connection', socket => {
     })
 });
 
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(conn_port, () => console.log(`Server running on port ${PORT}`));
