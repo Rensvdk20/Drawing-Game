@@ -2,11 +2,19 @@ const http = require('http');
 const express = require('express');
 const path = require('path');
 const socketio = require('socket.io');
+const mysql = require('mysql');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 const conn_port = process.env.PORT || 3100;
+
+const conn = mysql.createConnection({
+    host    : 'localhost',
+    user    : 'root',
+    password: '',
+    database: 'smoedoe_drawing'
+});
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -33,3 +41,17 @@ io.on('connection', socket => {
 });
 
 server.listen(conn_port, () => console.log(`Server running on port ${conn_port}`));
+
+//MySQL test
+conn.connect((err) => {
+    if(err) {
+        throw err;
+    }
+    console.log('MySQL connected');
+})
+
+app.get('/sql', (req, res) => {
+    conn.query('SELECT * FROM lobby', (err, result) => {
+        res.send(result);
+    });
+});
