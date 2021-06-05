@@ -10,10 +10,10 @@ const io = socketio(server);
 const conn_port = process.env.PORT || 3100;
 
 const conn = mysql.createConnection({
-    host    : 'localhost',
-    user    : 'root',
-    password: '',
-    database: 'smoedoe_drawing'
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'smoedoe_drawing'
 });
 
 // Set static folder
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Run when a client connects
 io.on('connection', socket => {
-    console.log("New Connection");
+    console.log("New Connection: " + socket.id);
 
     socket.on('startPath', (coords, color) => {
         socket.broadcast.emit('startPath', coords, color);

@@ -7,7 +7,7 @@ body {
   background-color: #e3e3e3;
 }
 
-.lobbys-container .col {
+.lobbys-container > .row > .col {
   background-color: white;
   min-height: 100vh;
 }
