@@ -1,54 +1,18 @@
 var socket = io();
 var drawingColor = 'black';
 var paths = [];
-// var sessionId = io.socket.sessionid;
-
-// ##### RECEIVER ##### //
-var coords;
-var my_path;
 
 paper.install(window);
 paper.setup('DrawArea');
 
-socket.on('startPath', (coords, color) => {
-    my_path = new Path();
-    my_path.strokeColor = color;
-    my_path.add(coords);
-    console.log(coords);
-});
-
-socket.on('continuePath', coords => {
-    my_path.add(new Point(coords));
-});
-
-socket.on('endPath', coords => {
-    my_path.simplify();
-});
-
-socket.on('toolbox', tool => {
-    console.log(tool);
-
-    switch(tool) {
-        case 'clearDrawing':
-            console.log("clear");
-            break;
-        case 'undoDrawing':
-            console.log("undo");
-            break;
-        default:
-            console.log('nothing found');
-    }
-
-    // path = paths.pop();
-    // path.remove();
-});
+// ##### -------------------------------------------------------------------------------------------------------------------- ##### //
 
 // ##### SENDER ##### //
 var pen = new Tool();
 var path;
 
-pen.minDistance = 1;
 var send_coords;
+pen.minDistance = 1;
 
 pen.onMouseDown = function(event) {
     path = new Path();
@@ -78,9 +42,52 @@ document.getElementById('clearDrawing').onclick = () => {
 $("#undoDrawing").click(() => {
     //Check if array is already empty
     var path = paths.pop();
-	path.remove();
+    if(path != undefined) {
+        path.remove();   
+    }
     socket.emit('toolbox', 'undoDrawing');
 });
+
+// ##### -------------------------------------------------------------------------------------------------------------------- ##### //
+
+// ##### RECEIVER ##### //
+var coords;
+
+socket.on('startPath', (coords, color) => {
+    path = new Path();
+    path.strokeColor = color;
+    path.add(coords);
+    console.log(coords);
+});
+
+socket.on('continuePath', coords => {
+    path.add(new Point(coords));
+});
+
+socket.on('endPath', coords => {
+    path.simplify();
+    paths.push(path);
+});
+
+socket.on('toolbox', tool => {
+    console.log(tool);
+
+    switch(tool) {
+        case 'clearDrawing':
+            paper.project.activeLayer.removeChildren();
+            break;
+        case 'undoDrawing':
+            var path = paths.pop();
+            if(path != undefined) {
+                path.remove();   
+            }
+            break;
+        default:
+            console.log('No tool found');
+    }
+});
+
+// ##### -------------------------------------------------------------------------------------------------------------------- ##### //
 
 //ColorPicker
 $(".cls-2").click(() => { drawingColor = '#8602af' });

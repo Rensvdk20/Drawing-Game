@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <title></title>
+</head>
+<body>
+    <div id="create_lobby">
+        <div>
+            <label for="username">Username</label><br />
+            <input class="mb-1" type="text" id='username_input_create'>
+        </div>
+        <div>
+            <label for="password">Password</label><br />
+            <input class="mb-1" type="text" id='password_input_create'>
+        </div>
+        <button class="btn btn-primary" onClick="createLobby()">Create lobby</button>
+    </div>
+
+    <div id="join_lobby">
+        <div>
+            <label for="username">Username</label><br />
+            <input class="mb-1" type="text" id='username_input_join'>
+        </div>
+        <div>
+            <label for="password">Password</label><br />
+            <input class="mb-1" type="text" id='password_input_join'>
+        </div>
+        <button class="btn btn-primary" onClick="joinLobby()">Join lobby</button>
+    </div>
+
+    <div id="lobby">
+        <h2>Lobby</h2>
+    </div>
+
+    <div id="game">
+        <h2>Game</h2>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/lobby.js"></script>
+</html>
