@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express');
 const path = require('path');
 const socketio = require('socket.io');
+const { v4: uuid_v4 } = require('uuid');
 // const mysql = require('mysql');
 
 const app = express();
@@ -85,9 +86,13 @@ io.on('connection', socket => {
         //Join the lobby
         socket.join(lobbyID);
         socket.to(lobbyID).emit('playerJoined', username);
+
+        socket.emit('getLobbyInfo', current_lobby);
+        socket.to(lobbyID).emit('getLobbyInfo', current_lobby);
     });
 
-    socket.on('createLobby', (lobbyID, username, password) => {
+    socket.on('createLobby', (username, password) => {
+        var lobbyID = uuid_v4();
         var Player = {
             name: username,
             socket_id: socket.id
@@ -102,6 +107,7 @@ io.on('connection', socket => {
         socket.join(lobbyID);
         socket.emit('lobbyCreated: ', lobbyID);
         console.log('lobbyCreated: ', lobbyID);
+        console.log(lobbys);
     });
 
     // Check for the current drawing player
