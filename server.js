@@ -25,6 +25,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Run when a client connects
 io.on('connection', socket => {
+    var current_lobby = {};
+    var lobbyID = "";
+    var lobbyIndex;
+    var Player = {};
+    var error = "";
+
     console.log(socket.id + " connected");
     
     // Set current drawing player
@@ -33,18 +39,17 @@ io.on('connection', socket => {
     //     console.log(current_player_socket_id);
     // }
 
-    socket.on('joinLobby', (lobbyID, username, password) => {
-        
-        var error = "";
-        var Player = {
+    socket.on('joinLobbyRequest', (lobby_ID, username, password) => {
+        Player = {
             name: username,
             socket_id: socket.id
         }
-        var current_lobby = {};
+
+        lobbyID = lobby_ID;
 
         //Check if there are any lobbys
         if(lobbys.length == 0) {
-            var error = "This lobby is not available (901)";
+            error = "This lobby is not available (901)";
             io.to(socket.id).emit('errorHandler', error);
             console.log('error 901');
             return;
@@ -52,20 +57,20 @@ io.on('connection', socket => {
 
         try {
             // Find lobby by lobbyID
-            var joined_lobby = lobbys.findIndex(x => x.id == lobbyID);
-            console.log(joined_lobby);
+            lobbyIndex = lobbys.findIndex(x => x.id == lobbyID);
+            console.log(lobbyIndex);
             // Get all players in current lobby
-            var current_lobby = lobbys[joined_lobby];
-            var players_in_lobby = lobbys[joined_lobby].players;
+            current_lobby = lobbys[lobbyIndex];
+            var players_in_lobby = lobbys[lobbyIndex].players;
         } catch(e) {
-            var error = "This lobby is not available (902)";
+            error = "This lobby is not available (902)";
             io.to(socket.id).emit('errorHandler', error);
             console.log('error 902 ' + e);
             return;
         }
 
         if(password != current_lobby.password) {
-            var error = "Incorrect password (904)";
+            error = "Incorrect password (904)";
             io.to(socket.id).emit('errorHandler', error);
             console.log('error 904');
             return;
@@ -73,41 +78,47 @@ io.on('connection', socket => {
 
         // Search for the object with a duplicate name (same name as input)
         if(duplicate_name_object = players_in_lobby.find(x => x.name === username)) {
-            var error = "This name is already taken (903)";
+            error = "This name is already taken (903)";
             io.to(socket.id).emit('errorHandler', error);
             console.log('error 903');
             return;
         }
 
         // Push the new player name in the lobby
-        lobbys[joined_lobby].players.push(Player);
-        console.log(lobbys[joined_lobby].players);
+        lobbys[lobbyIndex].players.push(Player);
+        console.log(lobbys[lobbyIndex].players);
     
         //Join the lobby
         socket.join(lobbyID);
-        socket.to(lobbyID).emit('playerJoined', username);
+        //Send new lobby info to all users in the lobby
+        socket.to(lobbyID).emit('playerJoined', current_lobby, username);
 
-        socket.emit('getLobbyInfo', current_lobby);
-        socket.to(lobbyID).emit('getLobbyInfo', current_lobby);
+        //Send the lobby info to the current user
+        socket.emit('joinLobby', current_lobby);
     });
 
     socket.on('createLobby', (username, password) => {
-        var lobbyID = uuid_v4();
-        var Player = {
+        lobbyID = uuid_v4();
+        Player = {
             name: username,
             socket_id: socket.id
         }
 
-        lobbys.push({
+        current_lobby = {
             id: lobbyID,
             password: password,
             players: [Player],
-        });
+        }
 
+        lobbys.push(current_lobby);
         socket.join(lobbyID);
-        socket.emit('lobbyCreated: ', lobbyID);
+
+        lobbyIndex = lobbys.findIndex(x => x.id == lobbyID);
+
+        socket.emit('lobbyCreated', lobbyID, current_lobby);
         console.log('lobbyCreated: ', lobbyID);
-        console.log(lobbys);
+        // console.log(lobbys);
+        console.log(current_lobby);
     });
 
     // Check for the current drawing player
@@ -131,9 +142,29 @@ io.on('connection', socket => {
 
     socket.on('disconnect', function() {
         console.log(socket.id + " disconnected");
+        if(Object.getOwnPropertyNames(current_lobby).length === 0){
+            //Not in a lobby
+            console.log(socket.id + " is not in a lobby");
+        } else {
+            //In a lobby
+            console.log(socket.id + " is in a lobby");
+            let playerIndex = getPlayerIndexBySocketid(socket.id);
+            removePlayerFromLobbyByIndex(playerIndex);
+        }
     });
+
+    function getPlayerIndexBySocketid(player_socket_id) {
+        //Get the array index of the player with socket_id
+        var playerIndex = lobbys[lobbyIndex].players.findIndex(x => x.socket_id === player_socket_id);
+        return playerIndex;
+    }
+
+    function removePlayerFromLobbyByIndex(playerIndex) {
+        //Remove the player from the lobby by the index
+        lobbys[lobbyIndex].players.splice(playerIndex, 1);
+        //Update the lobby for the remaining players
+        socket.to(lobbyID).emit('playerLeft', current_lobby, Player.name);
+    }
 });
-
-
 
 server.listen(conn_port, () => console.log(`Server running on port ${conn_port}`));

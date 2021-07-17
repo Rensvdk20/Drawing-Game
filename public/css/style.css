@@ -15,11 +15,3 @@ body {
 .lobbys-container #lobbys table tr:nth-child(even) {
   background-color: #ececec;
 }
-
-#lobby {
-  display: none;
-}
-
-#game {
-  display: none;
-}
