@@ -1,4 +1,7 @@
 var socket = io();
+var current_lobby = {};
+
+var defaultRoundSelected = 3;
 
 // ##### ---------- Error handling ---------- ##### //
 
@@ -11,8 +14,9 @@ socket.on('errorHandler', (error) => {
 
 if(URLGet('lobby')) {
     $('#page').load('/pages/join_lobby.html');
-    // console.log(URLGet('lobby'));
 }
+
+// ##### --- Buttons --- ##### //
 
 //Button pageload
 $(document).on('click', '.page_button', function () {
@@ -33,7 +37,23 @@ $(document).on('click', 'input#invite_link', function () {
 
 //Start game
 $(document).on('click', '#start_game', function () {
+    if(!jQuery.isEmptyObject(current_lobby)) {
+        socket.emit('prepareGame');
+    }
+});
 
+$(document).on('click', '#submit_input', function () {
+    if(!jQuery.isEmptyObject(current_lobby)) {
+        socket.emit('submitInput', $("#input_1").val());
+    }
+});
+
+// ##### --- Inputs --- ##### //
+
+//Change rounds
+$(document).on('change', '#rounds', function (event) {
+    let rounds = this.value;
+    socket.emit('changeRounds', rounds);
 });
 
 function URLGet(val) {
@@ -61,13 +81,20 @@ function joinLobbyRequest() {
     socket.emit('joinLobbyRequest', lobbyID, username, password);
 }
 
-function updateLobby(current_lobby) {
+function updateLobby() {
     let players = current_lobby.players;
+    console.log(players);
     $('#lobby_players').html('');
     for(i = 0; i < players.length; i++) {
-        $('#lobby_players').append("<li>" + players[i].name + "</li>");
+        if(i == 0) {
+            $('#lobby_players').append("<li>" + players[i].name + " &#x1F451;</li>");
+        } else {
+            $('#lobby_players').append("<li>" + players[i].name + "</li>");
+        }
     }
+}
 
+function getInviteLink() {
     if(window.location.hostname == "localhost") {
         $("input#invite_link").val(window.location.hostname + ":3100?lobby=" + current_lobby.id);
     } else {
@@ -76,32 +103,53 @@ function updateLobby(current_lobby) {
 }
 
 //Get lobby info for new joining player
-socket.on('joinLobby', current_lobby => {
+socket.on('joinLobby', received_current_lobby => {
+    current_lobby = received_current_lobby;
     console.log(current_lobby);
     $('#page').load('/pages/lobby.html', function() {
-        updateLobby(current_lobby);
+        updateLobby();
+        getInviteLink();
     });
 });
 
 //Get lobby info when a players joins your lobby
-socket.on('playerJoined', (current_lobby, username) => {
+socket.on('playerJoined', (received_current_lobby, username) => {
+    current_lobby = received_current_lobby;
     console.log(username + ' joined');
-    console.log(current_lobby);
-    updateLobby(current_lobby);
+    updateLobby();
 });
 
-socket.on('playerLeft', (current_lobby, username) => {
+socket.on('playerLeft', (received_current_lobby, username) => {
+    current_lobby = received_current_lobby;
     console.log(username + ' left');
-    console.log(current_lobby);
-    updateLobby(current_lobby);
+    updateLobby();
 });
 
 //Get lobby info when creating a lobby
-socket.on('lobbyCreated', (lobbyID, current_lobby) => {
-    console.log('Lobby: ' + lobbyID + ' has been created');
+socket.on('lobbyCreated', (received_current_lobby) => {
+    current_lobby = received_current_lobby;
+    console.log('Lobby: ' + current_lobby.id + ' has been created');
     console.log(current_lobby);
     $('#page').load('/pages/lobby.html', function() {
-        updateLobby(current_lobby);
+        updateLobby();
+        getInviteLink();
+
+        $("#options").append("<select id='rounds'>");
+        for(i = 1; i < 11; i++) {
+            if(i === defaultRoundSelected) {
+                $("#rounds").append("<option value='" + i + "' selected>" + i + " Rounds</option>");
+            } else {
+                $("#rounds").append("<option value='" + i + "'>" + i + " Rounds</option>");
+            }
+        }
+        $("#options").append("</select>");
+        $("#options").append("<br /><br />");
+        $("#options").append('<button id="start_game">Start</button>');
     });
-    $("#options").append('<button id="start_game">Start</button>');
+});
+
+//Game
+socket.on('sendAllToPage', (page) => {
+    console.log('Send to ' + page);
+    $('#page').load('/pages/game/' + page + '.html');
 });
